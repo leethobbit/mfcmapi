@@ -407,7 +407,6 @@ namespace dialog::editor
 
 		if (m_lpsOutputValue)
 		{
-			auto bFailed = false; // set true if we fail to get a prop and have to clean up memory
 			m_lpsOutputValue->ulPropTag = m_ulPropTag;
 			m_lpsOutputValue->dwAlignPad = NULL;
 			std::vector<BYTE> bin;
@@ -475,12 +474,7 @@ namespace dialog::editor
 				break;
 			default:
 				// We shouldn't ever get here unless some new prop type shows up
-				bFailed = true;
-				break;
-			}
-
-			if (bFailed)
-			{
+				// But if we do, we need to clean up a bit
 				// If we don't have a parent or we are the parent, then we can free here
 				if (!m_lpAllocParent || m_lpAllocParent == m_lpsOutputValue)
 				{
@@ -494,6 +488,7 @@ namespace dialog::editor
 					// Just drop the reference and m_lpAllocParent's free will clean it up
 					m_lpsOutputValue = nullptr;
 				}
+				break;
 			}
 		}
 	}
