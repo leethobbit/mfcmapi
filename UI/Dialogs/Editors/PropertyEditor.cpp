@@ -44,17 +44,17 @@ namespace dialog::editor
 		void OnOK() override;
 
 		// source variables
-		LPMAPIPROP m_lpMAPIProp;
-		ULONG m_ulPropTag;
-		bool m_bIsAB; // whether the tag is from the AB or not
-		const _SPropValue* m_lpsInputValue;
-		LPSPropValue m_lpsOutputValue;
-		bool m_bDirty;
-		bool m_bMVRow; // whether this row came from a multivalued property. Used for smart view parsing.
+		LPMAPIPROP m_lpMAPIProp{};
+		ULONG m_ulPropTag{};
+		bool m_bIsAB{}; // whether the tag is from the AB or not
+		const _SPropValue* m_lpsInputValue{};
+		LPSPropValue m_lpsOutputValue{};
+		bool m_bDirty{};
+		bool m_bMVRow{}; // whether this row came from a multivalued property. Used for smart view parsing.
 
 		// all calls to MAPIAllocateMore will use m_lpAllocParent
 		// this is not something to be freed
-		LPVOID m_lpAllocParent;
+		LPVOID m_lpAllocParent{};
 	};
 
 	// Create an editor for a MAPI property
@@ -67,20 +67,13 @@ namespace dialog::editor
 		_In_opt_ LPMAPIPROP lpMAPIProp,
 		ULONG ulPropTag,
 		_In_opt_ const _SPropValue* lpsPropValue)
-		: CEditor(pParentWnd, uidTitle, NULL, CEDITOR_BUTTON_OK | CEDITOR_BUTTON_CANCEL)
+		: CEditor(pParentWnd, uidTitle, NULL, CEDITOR_BUTTON_OK | CEDITOR_BUTTON_CANCEL), m_bIsAB(bIsAB),
+		  m_bMVRow(bMVRow), m_lpAllocParent(lpAllocParent), m_lpMAPIProp(lpMAPIProp), m_ulPropTag(ulPropTag),
+		  m_lpsInputValue(lpsPropValue)
 	{
 		TRACE_CONSTRUCTOR(SVCLASS);
 
-		m_bIsAB = bIsAB;
-		m_bMVRow = bMVRow;
-		m_lpAllocParent = lpAllocParent;
-		m_lpsOutputValue = nullptr;
-		m_bDirty = false;
-
-		m_lpMAPIProp = lpMAPIProp;
 		if (m_lpMAPIProp) m_lpMAPIProp->AddRef();
-		m_ulPropTag = ulPropTag;
-		m_lpsInputValue = lpsPropValue;
 
 		// If we didn't have an input value, we are creating a new property
 		// So by definition, we're already dirty
