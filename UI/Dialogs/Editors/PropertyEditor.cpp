@@ -529,7 +529,6 @@ namespace dialog::editor
 		std::wstring szTemp2;
 		auto sProp = SPropValue{};
 
-		//auto Bin = SBinary{};
 		std::vector<BYTE> bin;
 		std::string lpszA;
 		std::wstring lpszW;
