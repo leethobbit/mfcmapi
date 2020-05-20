@@ -524,8 +524,6 @@ namespace dialog::editor
 
 		if (paneID == static_cast<ULONG>(-1)) return static_cast<ULONG>(-1);
 
-		//std::wstring szTemp1;
-		//std::wstring szTemp2;
 		auto sProp = SPropValue{};
 
 		std::shared_ptr<viewpane::CountedTextPane> lpPane = nullptr;
