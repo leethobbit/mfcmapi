@@ -530,8 +530,6 @@ namespace dialog::editor
 		auto sProp = SPropValue{};
 
 		std::vector<BYTE> bin;
-		std::string lpszA;
-		std::wstring lpszW;
 
 		std::shared_ptr<viewpane::CountedTextPane> lpPane = nullptr;
 
@@ -636,7 +634,7 @@ namespace dialog::editor
 			}
 			else if (paneID == 1)
 			{
-				lpszA = GetStringA(1); // Do not free this
+				const auto lpszA = GetStringA(1); // Do not free this
 				bin =
 					std::vector<BYTE>{lpszA.c_str(), lpszA.c_str() + static_cast<ULONG>(sizeof(CHAR) * lpszA.length())};
 				SetBinary(0, bin.data(), static_cast<ULONG>(bin.size()));
@@ -662,7 +660,7 @@ namespace dialog::editor
 			if (paneID == 0)
 			{
 				size_t cbStr = 0;
-				lpszA = GetStringA(0);
+				const auto lpszA = GetStringA(0);
 
 				lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
 				if (lpPane)
@@ -695,7 +693,7 @@ namespace dialog::editor
 		case PT_UNICODE:
 			if (paneID == 0)
 			{
-				lpszW = GetStringW(0);
+				const auto lpszW = GetStringW(0);
 
 				lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
 				if (lpPane)
