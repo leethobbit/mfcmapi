@@ -20,13 +20,12 @@ namespace dialog::editor
 	CMultiValuePropertyEditor::CMultiValuePropertyEditor(
 		_In_ CWnd* pParentWnd,
 		UINT uidTitle,
-		UINT uidPrompt,
 		bool bIsAB,
 		_In_opt_ LPVOID lpAllocParent,
 		_In_opt_ LPMAPIPROP lpMAPIProp,
 		ULONG ulPropTag,
 		_In_opt_ const _SPropValue* lpsPropValue)
-		: CEditor(pParentWnd, uidTitle, uidPrompt, CEDITOR_BUTTON_OK | CEDITOR_BUTTON_CANCEL)
+		: CEditor(pParentWnd, uidTitle, NULL, CEDITOR_BUTTON_OK | CEDITOR_BUTTON_CANCEL)
 	{
 		TRACE_CONSTRUCTOR(MVCLASS);
 
@@ -339,7 +338,6 @@ namespace dialog::editor
 		const auto hRes = WC_H(DisplayPropertyEditor(
 			this,
 			IDS_EDITROW,
-			NULL,
 			m_bIsAB,
 			NULL, // not passing an allocation parent because we know we're gonna free the result
 			m_lpMAPIProp,
