@@ -107,8 +107,6 @@ namespace dialog::editor
 	{
 		std::wstring szTemp1;
 		std::wstring szTemp2;
-		size_t cbStr = 0;
-		std::wstring szGuid;
 
 		switch (PROP_TYPE(m_ulPropTag))
 		{
@@ -160,20 +158,20 @@ namespace dialog::editor
 			AddPane(viewpane::CountedTextPane::Create(1, IDS_BIN, false, IDS_CB));
 			if (m_lpsInputValue && strings::CheckStringProp(m_lpsInputValue, PT_STRING8))
 			{
-				auto lpszA = std::string(m_lpsInputValue->Value.lpszA);
+				const auto lpszA = std::string(m_lpsInputValue->Value.lpszA);
+				const auto len = lpszA.length();
 				SetStringA(0, lpszA);
 
 				auto lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
 				if (lpPane)
 				{
-					cbStr = lpszA.length() * sizeof(CHAR);
-
+					const auto cbStr = len * sizeof(CHAR);
 					lpPane->SetBinary(reinterpret_cast<const BYTE*>(lpszA.c_str()), cbStr);
 					lpPane->SetCount(cbStr);
 				}
 
 				lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(0));
-				if (lpPane) lpPane->SetCount(cbStr);
+				if (lpPane) lpPane->SetCount(len);
 			}
 
 			break;
@@ -182,20 +180,20 @@ namespace dialog::editor
 			AddPane(viewpane::CountedTextPane::Create(1, IDS_BIN, false, IDS_CB));
 			if (m_lpsInputValue && strings::CheckStringProp(m_lpsInputValue, PT_UNICODE))
 			{
-				auto lpszW = std::wstring(m_lpsInputValue->Value.lpszW);
+				const auto lpszW = std::wstring(m_lpsInputValue->Value.lpszW);
+				const auto len = lpszW.length();
 				SetStringW(0, lpszW);
 
 				auto lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
 				if (lpPane)
 				{
-					cbStr = lpszW.length() * sizeof(WCHAR);
-
+					const auto cbStr = len * sizeof(WCHAR);
 					lpPane->SetBinary(reinterpret_cast<const BYTE*>(lpszW.c_str()), cbStr);
 					lpPane->SetCount(cbStr);
 				}
 
 				lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(0));
-				if (lpPane) lpPane->SetCount(lpszW.length());
+				if (lpPane) lpPane->SetCount(len);
 			}
 
 			break;
@@ -355,14 +353,12 @@ namespace dialog::editor
 			AddPane(viewpane::TextPane::CreateSingleLinePane(0, IDS_GUID, false));
 			if (m_lpsInputValue)
 			{
-				szGuid = guid::GUIDToStringAndName(m_lpsInputValue->Value.lpguid);
+				SetStringW(0, guid::GUIDToStringAndName(m_lpsInputValue->Value.lpguid));
 			}
 			else
 			{
-				szGuid = guid::GUIDToStringAndName(nullptr);
+				SetStringW(0, guid::GUIDToStringAndName(nullptr));
 			}
-
-			SetStringW(0, szGuid);
 			break;
 		case PT_SRESTRICTION:
 			AddPane(viewpane::TextPane::CreateCollapsibleTextPane(0, IDS_RESTRICTION, true));
