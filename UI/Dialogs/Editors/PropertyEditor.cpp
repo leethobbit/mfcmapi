@@ -16,7 +16,7 @@
 
 namespace dialog::editor
 {
-	static std::wstring SVCLASS = L"CPropertyEditor"; // STRING_OK
+	static std::wstring CLASS = L"CPropertyEditor"; // STRING_OK
 
 	class CPropertyEditor : public CEditor
 	{
@@ -71,7 +71,7 @@ namespace dialog::editor
 		  m_bMVRow(bMVRow), m_lpAllocParent(lpAllocParent), m_lpMAPIProp(lpMAPIProp), m_ulPropTag(ulPropTag),
 		  m_lpsInputValue(lpsPropValue)
 	{
-		TRACE_CONSTRUCTOR(SVCLASS);
+		TRACE_CONSTRUCTOR(CLASS);
 
 		if (m_lpMAPIProp) m_lpMAPIProp->AddRef();
 
@@ -87,7 +87,7 @@ namespace dialog::editor
 
 	CPropertyEditor::~CPropertyEditor()
 	{
-		TRACE_DESTRUCTOR(SVCLASS);
+		TRACE_DESTRUCTOR(CLASS);
 		if (m_lpMAPIProp) m_lpMAPIProp->Release();
 	}
 

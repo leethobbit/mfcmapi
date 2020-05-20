@@ -14,7 +14,7 @@
 
 namespace dialog::editor
 {
-	static std::wstring MVCLASS = L"CMultiValuePropertyEditor"; // STRING_OK
+	static std::wstring CLASS = L"CMultiValuePropertyEditor"; // STRING_OK
 
 	// Create an editor for a MAPI property
 	CMultiValuePropertyEditor::CMultiValuePropertyEditor(
@@ -29,7 +29,7 @@ namespace dialog::editor
 		  m_lpAllocParent(lpAllocParent), m_lpMAPIProp(lpMAPIProp), m_ulPropTag(ulPropTag),
 		  m_lpsInputValue(lpsPropValue)
 	{
-		TRACE_CONSTRUCTOR(MVCLASS);
+		TRACE_CONSTRUCTOR(CLASS);
 
 		if (m_lpMAPIProp) m_lpMAPIProp->AddRef();
 
@@ -40,7 +40,7 @@ namespace dialog::editor
 
 	CMultiValuePropertyEditor::~CMultiValuePropertyEditor()
 	{
-		TRACE_DESTRUCTOR(MVCLASS);
+		TRACE_DESTRUCTOR(CLASS);
 		if (m_lpMAPIProp) m_lpMAPIProp->Release();
 	}
 
