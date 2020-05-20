@@ -524,8 +524,8 @@ namespace dialog::editor
 
 		if (paneID == static_cast<ULONG>(-1)) return static_cast<ULONG>(-1);
 
-		std::wstring szTemp1;
-		std::wstring szTemp2;
+		//std::wstring szTemp1;
+		//std::wstring szTemp2;
 		auto sProp = SPropValue{};
 
 		std::shared_ptr<viewpane::CountedTextPane> lpPane = nullptr;
@@ -604,12 +604,16 @@ namespace dialog::editor
 
 			break;
 		case PT_SYSTIME: // components are unsigned hex
+		{
 			sProp.Value.ft.dwLowDateTime = strings::wstringToUlong(GetStringW(0), 16);
 			sProp.Value.ft.dwHighDateTime = strings::wstringToUlong(GetStringW(1), 16);
 
-			strings::FileTimeToString(sProp.Value.ft, szTemp1, szTemp2);
-			SetStringW(2, szTemp1);
-			break;
+			std::wstring prop;
+			std::wstring altprop;
+			strings::FileTimeToString(sProp.Value.ft, prop, altprop);
+			SetStringW(2, prop);
+		}
+		break;
 		case PT_BINARY:
 		{
 			std::vector<BYTE> bin;
