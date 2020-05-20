@@ -12,89 +12,51 @@
 #include <core/interpret/proptags.h>
 #include <core/addin/mfcmapi.h>
 #include <core/property/parseProperty.h>
+#include <UI/ViewPane/SmartViewPane.h>
 
 namespace dialog::editor
 {
-	_Check_return_ HRESULT DisplayPropertyEditor(
-		_In_ CWnd* pParentWnd,
-		UINT uidTitle,
-		UINT uidPrompt,
-		bool bIsAB,
-		_In_opt_ LPVOID lpAllocParent,
-		_In_opt_ LPMAPIPROP lpMAPIProp,
-		ULONG ulPropTag,
-		bool bMVRow,
-		_In_opt_ const _SPropValue* lpsPropValue,
-		_Inout_opt_ LPSPropValue* lpNewValue)
-	{
-		auto hRes = S_OK;
-
-		_SPropValue* sourceProp = nullptr;
-		// We got a MAPI prop object and no input value, go look one up
-		if (lpMAPIProp && !lpsPropValue)
-		{
-			auto sTag = SPropTagArray{
-				1, PROP_TYPE(ulPropTag) == PT_ERROR ? CHANGE_PROP_TYPE(ulPropTag, PT_UNSPECIFIED) : ulPropTag};
-			ULONG ulValues = NULL;
-
-			hRes = WC_MAPI(lpMAPIProp->GetProps(&sTag, NULL, &ulValues, &sourceProp));
-
-			// Suppress MAPI_E_NOT_FOUND error when the source type is non error
-			if (sourceProp && PROP_TYPE(sourceProp->ulPropTag) == PT_ERROR &&
-				sourceProp->Value.err == MAPI_E_NOT_FOUND && PROP_TYPE(ulPropTag) != PT_ERROR)
-			{
-				MAPIFreeBuffer(sourceProp);
-				sourceProp = nullptr;
-			}
-
-			if (hRes == MAPI_E_CALL_FAILED)
-			{
-				// Just suppress this - let the user edit anyway
-				hRes = S_OK;
-			}
-
-			// In all cases where we got a value back, we need to reset our property tag to the value we got
-			// This will address when the source is PT_UNSPECIFIED, when the returned value is PT_ERROR,
-			// or any other case where the returned value has a different type than requested
-			if (SUCCEEDED(hRes) && sourceProp)
-			{
-				ulPropTag = sourceProp->ulPropTag;
-			}
-
-			lpsPropValue = sourceProp;
-		}
-		else if (lpsPropValue && !ulPropTag)
-		{
-			ulPropTag = lpsPropValue->ulPropTag;
-		}
-
-		// Check for the multivalue prop case
-		if (PROP_TYPE(ulPropTag) & MV_FLAG)
-		{
-			CMultiValuePropertyEditor MyPropertyEditor(
-				pParentWnd, uidTitle, uidPrompt, bIsAB, lpAllocParent, lpMAPIProp, ulPropTag, lpsPropValue);
-			if (MyPropertyEditor.DisplayDialog())
-			{
-				if (lpNewValue) *lpNewValue = MyPropertyEditor.DetachModifiedSPropValue();
-			}
-		}
-		// Or the single value prop case
-		else
-		{
-			CPropertyEditor MyPropertyEditor(
-				pParentWnd, uidTitle, uidPrompt, bIsAB, bMVRow, lpAllocParent, lpMAPIProp, ulPropTag, lpsPropValue);
-			if (MyPropertyEditor.DisplayDialog())
-			{
-				if (lpNewValue) *lpNewValue = MyPropertyEditor.DetachModifiedSPropValue();
-			}
-		}
-
-		MAPIFreeBuffer(sourceProp);
-
-		return hRes;
-	}
-
 	static std::wstring SVCLASS = L"CPropertyEditor"; // STRING_OK
+
+	class CPropertyEditor : public CEditor
+	{
+	public:
+		CPropertyEditor(
+			_In_ CWnd* pParentWnd,
+			UINT uidTitle,
+			UINT uidPrompt,
+			bool bIsAB,
+			bool bMVRow,
+			_In_opt_ LPVOID lpAllocParent,
+			_In_opt_ LPMAPIPROP lpMAPIProp,
+			ULONG ulPropTag,
+			_In_opt_ const _SPropValue* lpsPropValue);
+		~CPropertyEditor();
+
+		// Get values after we've done the DisplayDialog
+		_Check_return_ LPSPropValue DetachModifiedSPropValue() noexcept;
+
+	private:
+		BOOL OnInitDialog() override;
+		void InitPropertyControls();
+		void WriteStringsToSPropValue();
+		void WriteSPropValueToObject() const;
+		_Check_return_ ULONG HandleChange(UINT nID) override;
+		void OnOK() override;
+
+		// source variables
+		LPMAPIPROP m_lpMAPIProp;
+		ULONG m_ulPropTag;
+		bool m_bIsAB; // whether the tag is from the AB or not
+		const _SPropValue* m_lpsInputValue;
+		LPSPropValue m_lpsOutputValue;
+		bool m_bDirty;
+		bool m_bMVRow; // whether this row came from a multivalued property. Used for smart view parsing.
+
+		// all calls to MAPIAllocateMore will use m_lpAllocParent
+		// this is not something to be freed
+		LPVOID m_lpAllocParent;
+	};
 
 	// Create an editor for a MAPI property
 	CPropertyEditor::CPropertyEditor(
@@ -799,5 +761,84 @@ namespace dialog::editor
 
 		OnRecalcLayout();
 		return paneID;
+	}
+
+	_Check_return_ HRESULT DisplayPropertyEditor(
+		_In_ CWnd* pParentWnd,
+		UINT uidTitle,
+		UINT uidPrompt,
+		bool bIsAB,
+		_In_opt_ LPVOID lpAllocParent,
+		_In_opt_ LPMAPIPROP lpMAPIProp,
+		ULONG ulPropTag,
+		bool bMVRow,
+		_In_opt_ const _SPropValue* lpsPropValue,
+		_Inout_opt_ LPSPropValue* lpNewValue)
+	{
+		auto hRes = S_OK;
+
+		_SPropValue* sourceProp = nullptr;
+		// We got a MAPI prop object and no input value, go look one up
+		if (lpMAPIProp && !lpsPropValue)
+		{
+			auto sTag = SPropTagArray{
+				1, PROP_TYPE(ulPropTag) == PT_ERROR ? CHANGE_PROP_TYPE(ulPropTag, PT_UNSPECIFIED) : ulPropTag};
+			ULONG ulValues = NULL;
+
+			hRes = WC_MAPI(lpMAPIProp->GetProps(&sTag, NULL, &ulValues, &sourceProp));
+
+			// Suppress MAPI_E_NOT_FOUND error when the source type is non error
+			if (sourceProp && PROP_TYPE(sourceProp->ulPropTag) == PT_ERROR &&
+				sourceProp->Value.err == MAPI_E_NOT_FOUND && PROP_TYPE(ulPropTag) != PT_ERROR)
+			{
+				MAPIFreeBuffer(sourceProp);
+				sourceProp = nullptr;
+			}
+
+			if (hRes == MAPI_E_CALL_FAILED)
+			{
+				// Just suppress this - let the user edit anyway
+				hRes = S_OK;
+			}
+
+			// In all cases where we got a value back, we need to reset our property tag to the value we got
+			// This will address when the source is PT_UNSPECIFIED, when the returned value is PT_ERROR,
+			// or any other case where the returned value has a different type than requested
+			if (SUCCEEDED(hRes) && sourceProp)
+			{
+				ulPropTag = sourceProp->ulPropTag;
+			}
+
+			lpsPropValue = sourceProp;
+		}
+		else if (lpsPropValue && !ulPropTag)
+		{
+			ulPropTag = lpsPropValue->ulPropTag;
+		}
+
+		// Check for the multivalue prop case
+		if (PROP_TYPE(ulPropTag) & MV_FLAG)
+		{
+			CMultiValuePropertyEditor MyPropertyEditor(
+				pParentWnd, uidTitle, uidPrompt, bIsAB, lpAllocParent, lpMAPIProp, ulPropTag, lpsPropValue);
+			if (MyPropertyEditor.DisplayDialog())
+			{
+				if (lpNewValue) *lpNewValue = MyPropertyEditor.DetachModifiedSPropValue();
+			}
+		}
+		// Or the single value prop case
+		else
+		{
+			CPropertyEditor MyPropertyEditor(
+				pParentWnd, uidTitle, uidPrompt, bIsAB, bMVRow, lpAllocParent, lpMAPIProp, ulPropTag, lpsPropValue);
+			if (MyPropertyEditor.DisplayDialog())
+			{
+				if (lpNewValue) *lpNewValue = MyPropertyEditor.DetachModifiedSPropValue();
+			}
+		}
+
+		MAPIFreeBuffer(sourceProp);
+
+		return hRes;
 	}
 } // namespace dialog::editor

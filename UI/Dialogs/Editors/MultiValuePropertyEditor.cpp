@@ -10,6 +10,7 @@
 #include <core/addin/mfcmapi.h>
 #include <core/mapi/mapiFunctions.h>
 #include <core/property/parseProperty.h>
+#include <UI/ViewPane/SmartViewPane.h>
 
 namespace dialog::editor
 {
