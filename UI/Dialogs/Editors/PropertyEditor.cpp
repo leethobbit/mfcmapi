@@ -524,7 +524,6 @@ namespace dialog::editor
 
 		if (paneID == static_cast<ULONG>(-1)) return static_cast<ULONG>(-1);
 
-		std::wstring szTmpString;
 		std::wstring szTemp1;
 		std::wstring szTemp2;
 		auto sProp = SPropValue{};
@@ -537,15 +536,14 @@ namespace dialog::editor
 		switch (PROP_TYPE(m_ulPropTag))
 		{
 		case PT_I2: // signed 16 bit
-			szTmpString = GetStringW(paneID);
 			if (paneID == 0)
 			{
-				sProp.Value.i = static_cast<short int>(strings::wstringToLong(szTmpString, 10));
+				sProp.Value.i = static_cast<short int>(strings::wstringToLong(GetStringW(0), 10));
 				SetHex(1, sProp.Value.i);
 			}
 			else if (paneID == 1)
 			{
-				sProp.Value.i = static_cast<short int>(strings::wstringToLong(szTmpString, 16));
+				sProp.Value.i = static_cast<short int>(strings::wstringToLong(GetStringW(1), 16));
 				SetDecimal(0, sProp.Value.i);
 			}
 
@@ -555,15 +553,14 @@ namespace dialog::editor
 
 			break;
 		case PT_LONG: // unsigned 32 bit
-			szTmpString = GetStringW(paneID);
 			if (paneID == 0)
 			{
-				sProp.Value.l = static_cast<LONG>(strings::wstringToUlong(szTmpString, 10));
+				sProp.Value.l = static_cast<LONG>(strings::wstringToUlong(GetStringW(0), 10));
 				SetHex(1, sProp.Value.l);
 			}
 			else if (paneID == 1)
 			{
-				sProp.Value.l = static_cast<LONG>(strings::wstringToUlong(szTmpString, 16));
+				sProp.Value.l = static_cast<LONG>(strings::wstringToUlong(GetStringW(1), 16));
 				SetStringf(0, L"%d", sProp.Value.l); // STRING_OK
 			}
 
@@ -575,16 +572,13 @@ namespace dialog::editor
 		case PT_CURRENCY:
 			if (paneID == 0 || paneID == 1)
 			{
-				szTmpString = GetStringW(0);
-				sProp.Value.cur.Hi = strings::wstringToUlong(szTmpString, 16, false);
-				szTmpString = GetStringW(1);
-				sProp.Value.cur.Lo = strings::wstringToUlong(szTmpString, 16, false);
+				sProp.Value.cur.Hi = strings::wstringToUlong(GetStringW(0), 16, false);
+				sProp.Value.cur.Lo = strings::wstringToUlong(GetStringW(1), 16, false);
 				SetStringW(2, strings::CurrencyToString(sProp.Value.cur));
 			}
 			else if (paneID == 2)
 			{
-				szTmpString = GetStringW(paneID);
-				sProp.Value.cur.int64 = strings::wstringToCurrency(szTmpString);
+				sProp.Value.cur.int64 = strings::wstringToCurrency(GetStringW(2));
 				SetHex(0, static_cast<int>(sProp.Value.cur.Hi));
 				SetHex(1, static_cast<int>(sProp.Value.cur.Lo));
 			}
@@ -593,16 +587,13 @@ namespace dialog::editor
 		case PT_I8:
 			if (paneID == 0 || paneID == 1)
 			{
-				szTmpString = GetStringW(0);
-				sProp.Value.li.HighPart = static_cast<long>(strings::wstringToUlong(szTmpString, 16, false));
-				szTmpString = GetStringW(1);
-				sProp.Value.li.LowPart = static_cast<long>(strings::wstringToUlong(szTmpString, 16, false));
+				sProp.Value.li.HighPart = static_cast<long>(strings::wstringToUlong(GetStringW(0), 16, false));
+				sProp.Value.li.LowPart = static_cast<long>(strings::wstringToUlong(GetStringW(1), 16, false));
 				SetStringf(2, L"%I64d", sProp.Value.li.QuadPart); // STRING_OK
 			}
 			else if (paneID == 2)
 			{
-				szTmpString = GetStringW(paneID);
-				sProp.Value.li.QuadPart = strings::wstringToInt64(szTmpString);
+				sProp.Value.li.QuadPart = strings::wstringToInt64(GetStringW(2));
 				SetHex(0, static_cast<int>(sProp.Value.li.HighPart));
 				SetHex(1, static_cast<int>(sProp.Value.li.LowPart));
 			}
@@ -613,10 +604,8 @@ namespace dialog::editor
 
 			break;
 		case PT_SYSTIME: // components are unsigned hex
-			szTmpString = GetStringW(0);
-			sProp.Value.ft.dwLowDateTime = strings::wstringToUlong(szTmpString, 16);
-			szTmpString = GetStringW(1);
-			sProp.Value.ft.dwHighDateTime = strings::wstringToUlong(szTmpString, 16);
+			sProp.Value.ft.dwLowDateTime = strings::wstringToUlong(GetStringW(0), 16);
+			sProp.Value.ft.dwHighDateTime = strings::wstringToUlong(GetStringW(1), 16);
 
 			strings::FileTimeToString(sProp.Value.ft, szTemp1, szTemp2);
 			SetStringW(2, szTemp1);
