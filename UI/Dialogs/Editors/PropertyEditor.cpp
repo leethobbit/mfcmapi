@@ -529,8 +529,6 @@ namespace dialog::editor
 		std::wstring szTemp2;
 		auto sProp = SPropValue{};
 
-		std::vector<BYTE> bin;
-
 		std::shared_ptr<viewpane::CountedTextPane> lpPane = nullptr;
 
 		// If we get here, something changed - set the dirty flag
@@ -625,6 +623,7 @@ namespace dialog::editor
 			break;
 		case PT_BINARY:
 		{
+			std::vector<BYTE> bin;
 			if (paneID == 0 || paneID == 2)
 			{
 				ClearHighlight(0);
@@ -678,7 +677,7 @@ namespace dialog::editor
 			}
 			else if (paneID == 1)
 			{
-				bin = GetBinary(1);
+				const auto bin = GetBinary(1);
 
 				SetStringA(0, std::string(reinterpret_cast<LPCSTR>(bin.data()), bin.size()));
 
@@ -712,7 +711,7 @@ namespace dialog::editor
 			else if (paneID == 1)
 			{
 				lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(0));
-				bin = GetBinary(1);
+				const auto bin = GetBinary(1);
 				if (!(bin.size() % sizeof(WCHAR)))
 				{
 					SetStringW(0, std::wstring(reinterpret_cast<LPCWSTR>(bin.data()), bin.size() / sizeof(WCHAR)));
