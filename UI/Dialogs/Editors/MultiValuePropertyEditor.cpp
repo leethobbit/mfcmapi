@@ -33,9 +33,7 @@ namespace dialog::editor
 
 		if (m_lpMAPIProp) m_lpMAPIProp->AddRef();
 
-		const auto szPromptPostFix = strings::format(
-			L"\r\n%ws", proptags::TagToString(m_ulPropTag, m_lpMAPIProp, m_bIsAB, false).c_str()); // STRING_OK
-		SetPromptPostFix(szPromptPostFix);
+		SetPromptPostFix(proptags::TagToString(m_ulPropTag, m_lpMAPIProp, m_bIsAB, false));
 
 		InitPropertyControls();
 	}
