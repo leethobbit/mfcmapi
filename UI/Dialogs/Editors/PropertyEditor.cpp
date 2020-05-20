@@ -639,8 +639,6 @@ namespace dialog::editor
 				SetBinary(0, bin.data(), static_cast<ULONG>(bin.size()));
 			}
 
-			mapi::setBin(sProp) = {static_cast<ULONG>(bin.size()), bin.data()};
-
 			lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(0));
 			if (lpPane) lpPane->SetCount(bin.size());
 
