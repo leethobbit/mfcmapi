@@ -526,8 +526,6 @@ namespace dialog::editor
 
 		auto sProp = SPropValue{};
 
-		std::shared_ptr<viewpane::CountedTextPane> lpPane = nullptr;
-
 		// If we get here, something changed - set the dirty flag
 		m_bDirty = true;
 
@@ -630,7 +628,7 @@ namespace dialog::editor
 				SetBinary(0, bin.data(), static_cast<ULONG>(bin.size()));
 			}
 
-			lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(0));
+			auto lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(0));
 			if (lpPane) lpPane->SetCount(bin.size());
 
 			lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
@@ -650,7 +648,7 @@ namespace dialog::editor
 				size_t cbStr = 0;
 				const auto lpszA = GetStringA(0);
 
-				lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
+				auto lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
 				if (lpPane)
 				{
 					cbStr = lpszA.length() * sizeof(CHAR);
@@ -670,7 +668,7 @@ namespace dialog::editor
 
 				SetStringA(0, std::string(reinterpret_cast<LPCSTR>(bin.data()), bin.size()));
 
-				lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(0));
+				auto lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(0));
 				if (lpPane) lpPane->SetCount(bin.size());
 
 				lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
@@ -683,7 +681,7 @@ namespace dialog::editor
 			{
 				const auto lpszW = GetStringW(0);
 
-				lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
+				auto lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
 				if (lpPane)
 				{
 					const auto cbStr = lpszW.length() * sizeof(WCHAR);
@@ -699,7 +697,7 @@ namespace dialog::editor
 			}
 			else if (paneID == 1)
 			{
-				lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(0));
+				auto lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(0));
 				const auto bin = GetBinary(1);
 				if (!(bin.size() % sizeof(WCHAR)))
 				{
