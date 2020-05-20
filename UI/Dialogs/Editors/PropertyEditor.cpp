@@ -107,7 +107,6 @@ namespace dialog::editor
 	{
 		std::wstring szTemp1;
 		std::wstring szTemp2;
-		std::shared_ptr<viewpane::CountedTextPane> lpPane;
 		size_t cbStr = 0;
 		std::wstring szGuid;
 
@@ -164,7 +163,7 @@ namespace dialog::editor
 				auto lpszA = std::string(m_lpsInputValue->Value.lpszA);
 				SetStringA(0, lpszA);
 
-				lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
+				auto lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
 				if (lpPane)
 				{
 					cbStr = lpszA.length() * sizeof(CHAR);
@@ -186,7 +185,7 @@ namespace dialog::editor
 				auto lpszW = std::wstring(m_lpsInputValue->Value.lpszW);
 				SetStringW(0, lpszW);
 
-				lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
+				auto lpPane = std::dynamic_pointer_cast<viewpane::CountedTextPane>(GetPane(1));
 				if (lpPane)
 				{
 					cbStr = lpszW.length() * sizeof(WCHAR);
@@ -274,7 +273,7 @@ namespace dialog::editor
 			break;
 		case PT_BINARY:
 		{
-			lpPane = viewpane::CountedTextPane::Create(0, IDS_BIN, false, IDS_CB);
+			auto lpPane = viewpane::CountedTextPane::Create(0, IDS_BIN, false, IDS_CB);
 			AddPane(lpPane);
 			AddPane(viewpane::CountedTextPane::Create(1, IDS_TEXT, false, IDS_CCH));
 			auto smartViewPane = viewpane::SmartViewPane::Create(2, IDS_SMARTVIEW);
